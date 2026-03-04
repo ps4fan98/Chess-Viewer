@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Chess Replay</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0-beta.6"></script>
+<script src="https://cdn.jsdelivr.net/npm/cm-chessboard@8/dist/cm-chessboard.min.js"></script>
+
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/dist/cm-chessboard.css"/>
+
+<style>
+body {
+font-family: Arial;
+text-align:center;
+background:#111;
+color:white;
+}
+
+#board {
+width:420px;
+margin:auto;
+margin-top:40px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>Chess Game Replay</h2>
+<div id="board"></div>
+
+<script>
+
+const board = new Chessboard("board")
+
+async function loadPGN() {
+
+let response = await fetch("game.pgn")
+let pgn = await response.text()
+
+let chess = new Chess()
+chess.loadPgn(pgn)
+
+let history = chess.history({ verbose:true })
+
+let game = new Chess()
+
+for (const move of history) {
+
+game.move(move)
+
+board.setPosition(game.fen())
+
+await new Promise(r => setTimeout(r,1000))
+
+}
+
+}
+
+loadPGN()
+
+</script>
+
+</body>
+</html>

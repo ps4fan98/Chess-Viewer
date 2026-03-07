@@ -1,76 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chess.com Realtime PGN Replay</title>
+<meta charset="UTF-8">
+<title>Chess Replay</title>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.13.4/chess.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/cm-chessboard@8/dist/cm-chessboard.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0-beta.6"></script>
+<script src="https://cdn.jsdelivr.net/npm/cm-chessboard@8/dist/cm-chessboard.min.js"></script>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/dist/cm-chessboard.css">
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/dist/cm-chessboard.css"/>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #111;
-      color: white;
-      margin: 0;
-      padding: 24px;
-    }
+<style>
+body {
+font-family: Arial;
+text-align:center;
+background:#111;
+color:white;
+}
 
-    #controls {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
+#board {
+width:420px;
+margin:auto;
+margin-top:40px;
+}
+</style>
 
-    #board {
-      width: 420px;
-      margin: 16px auto;
-    }
-
-    button {
-      padding: 8px 14px;
-      border: 0;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    #status {
-      min-height: 24px;
-      margin-top: 8px;
-      font-size: 14px;
-    }
-
-    #status.error {
-      color: #ff7676;
-      font-weight: 700;
-    }
-  </style>
 </head>
+
 <body>
-  <h2>Chess.com Realtime PGN Replay</h2>
 
-  <div id="controls">
-    <input id="pgnFile" type="file" accept=".pgn,text/plain">
-    <button id="startBtn" disabled>Start</button>
-    <button id="stopBtn" disabled>Stop</button>
-  </div>
+<h2>Chess Game Replay</h2>
+<div id="board"></div>
 
-  <div id="status" role="status" aria-live="polite">Upload a PGN file to begin.</div>
-  <div id="board"></div>
+<script>
 
-  <script src="replay.js"></script>
+const board = new Chessboard("board")
+
+async function loadPGN() {
+
+let response = await fetch("game.pgn")
+let pgn = await response.text()
+
+let chess = new Chess()
+chess.loadPgn(pgn)
+
+let history = chess.history({ verbose:true })
+
+let game = new Chess()
+
+for (const move of history) {
+
+game.move(move)
+
+board.setPosition(game.fen())
+
+await new Promise(r => setTimeout(r,1000))
+
+}
+
+}
+
+loadPGN()
+
+</script>
+
 </body>
 </html>
